@@ -22,19 +22,28 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
 	}
 
 	func applyMutation(_ mutation: TextStory.TextMutation) {
-		guard let textView else {
+		guard let textView, let contentStorage = textView.contentStorage else {
 			return
 		}
 
-		if let manager = textView.undoManager, let contentStorage = textView.contentStorage {
+		if let manager = textView.undoManager {
 			let inverse = contentStorage.inverseMutation(for: mutation)
 
-			manager.registerUndo(withTarget: self) { _ in
-                textView.replaceCharacters(in: inverse.range, with: inverse.string)
-			}
+			manager.registerUndo(withTarget: self, handler: { _ in
+				MainActor.assumeIsolated {
+					textView.replaceCharacters(in: inverse.range, with: inverse.string)
+				}
+			})
 		}
 
-        textView.replaceCharacters(in: mutation.range, with: mutation.string)
+		textView.textWillChange(self)
+		contentStorage.performEditingTransaction {
+			let changeTextRange = NSTextRange(mutation.range, in: contentStorage)!
+			textView.textDelegate?.textView(textView, willChangeTextIn: changeTextRange, replacementString: mutation.string)
+			contentStorage.applyMutation(mutation)
+			textView.textDelegate?.textView(textView, didChangeTextIn: changeTextRange, replacementString: mutation.string)
+		}
+		textView.didChangeText()
 	}
 }
 

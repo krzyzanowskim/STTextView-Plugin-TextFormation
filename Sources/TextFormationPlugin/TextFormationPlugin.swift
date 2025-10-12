@@ -65,11 +65,6 @@ public struct TextFormationPlugin: STPlugin {
 
 			let mutation = TextMutation(string: string, range: range, limit: limit)
 
-			textView.undoManager?.beginUndoGrouping()
-			defer {
-				textView.undoManager?.endUndoGrouping()
-			}
-
 			for filter in filters {
 				switch filter.processMutation(mutation, in: adapter, with: whitespaceProviders) {
 				case .none:

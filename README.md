@@ -1,7 +1,5 @@
 [STTextView](https://github.com/krzyzanowskim/STTextView) typing completions with [TextFormation](https://github.com/ChimeHQ/TextFormation).
 
-- ⚠️ There is a bug related to undo. I haven't tracked this down yet.
-
 ## Installation
 
 Add the plugin package as a dependency of your application, then register/add it to the `STTextView` instance:

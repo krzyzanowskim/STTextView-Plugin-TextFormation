@@ -26,18 +26,6 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
 			return
 		}
 
-        if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, undoManager.isRedoing {
-			let inverse = contentStorage.inverseMutation(for: mutation)
-
-			undoManager.registerUndo(withTarget: textView, handler: { textView in
-				MainActor.assumeIsolated {
-					textView.replaceCharacters(in: inverse.range, with: inverse.string)
-				}
-			})
-		}
-
-        textView.breakUndoCoalescing()
-
 		textView.textWillChange(textView)
         let changeTextRange = NSTextRange(mutation.range, in: contentStorage)!
         textView.textDelegate?.textView(textView, willChangeTextIn: changeTextRange, replacementString: mutation.string)
@@ -48,6 +36,18 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
 
         textView.textDelegate?.textView(textView, didChangeTextIn: changeTextRange, replacementString: mutation.string)
 		textView.didChangeText()
+
+        textView.breakUndoCoalescing()
+
+        if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, undoManager.isRedoing {
+            let inverse = contentStorage.inverseMutation(for: mutation)
+
+            undoManager.registerUndo(withTarget: textView, handler: { textView in
+                MainActor.assumeIsolated {
+                    textView.replaceCharacters(in: inverse.range, with: inverse.string)
+                }
+            })
+        }
 	}
 }
 

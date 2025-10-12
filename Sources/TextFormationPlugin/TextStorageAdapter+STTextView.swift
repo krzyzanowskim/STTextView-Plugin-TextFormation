@@ -39,7 +39,7 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
 
         textView.breakUndoCoalescing()
 
-        if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, undoManager.isRedoing {
+        if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, !undoManager.isRedoing {
             let inverse = contentStorage.inverseMutation(for: mutation)
 
             undoManager.registerUndo(withTarget: textView, handler: { textView in

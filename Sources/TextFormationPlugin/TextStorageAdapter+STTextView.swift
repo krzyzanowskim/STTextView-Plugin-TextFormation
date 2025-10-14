@@ -1,4 +1,8 @@
-import AppKit
+#if os(macOS)
+    import AppKit
+#elseif os(iOS) || targetEnvironment(macCatalyst)
+    import UIKit
+#endif
 import Foundation
 
 import STTextView
@@ -7,35 +11,35 @@ import TextStory
 
 @MainActor
 private final class TextStoringAdapter: @preconcurrency TextStoring {
-	weak var textView: STTextView?
+    weak var textView: STTextView?
 
-	var length: Int {
-		(textView?.contentStorage as? NSTextContentManager)?.length ?? 0
-	}
+    var length: Int {
+        (textView?.contentStorage as? NSTextContentManager)?.length ?? 0
+    }
 
-	init(textView: STTextView) {
-		self.textView = textView
-	}
+    init(textView: STTextView) {
+        self.textView = textView
+    }
 
-	func substring(from range: NSRange) -> String? {
-		textView?.contentStorage?.substring(from: range)
-	}
+    func substring(from range: NSRange) -> String? {
+        textView?.contentStorage?.substring(from: range)
+    }
 
-	func applyMutation(_ mutation: TextStory.TextMutation) {
-		guard let textView, let contentStorage = textView.contentStorage else {
-			return
-		}
+    func applyMutation(_ mutation: TextStory.TextMutation) {
+        guard let textView, let contentStorage = textView.contentStorage else {
+            return
+        }
 
-		textView.textWillChange(textView)
+        textView.textWillChange(textView)
         let changeTextRange = NSTextRange(mutation.range, in: contentStorage)!
         textView.textDelegate?.textView(textView, willChangeTextIn: changeTextRange, replacementString: mutation.string)
 
-		contentStorage.performEditingTransaction {
-			contentStorage.applyMutation(mutation)
-		}
+        contentStorage.performEditingTransaction {
+            contentStorage.applyMutation(mutation)
+        }
 
         textView.textDelegate?.textView(textView, didChangeTextIn: changeTextRange, replacementString: mutation.string)
-		textView.didChangeText()
+        textView.didChangeText()
 
         textView.breakUndoCoalescing()
 
@@ -48,22 +52,22 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
                 }
             })
         }
-	}
+    }
 }
 
 private extension STTextView {
-	var contentStorage: NSTextContentStorage? {
-		textContentManager as? NSTextContentStorage
-	}
+    var contentStorage: NSTextContentStorage? {
+        textContentManager as? NSTextContentStorage
+    }
 }
 
 public extension TextInterfaceAdapter {
-	@MainActor
-	convenience init(textView: STTextView) {
-		self.init(
-			getSelection: { textView.textSelection },
-			setSelection: { textView.textSelection = $0 },
-			storage: TextStoringAdapter(textView: textView)
-		)
-	}
+    @MainActor
+    convenience init(textView: STTextView) {
+        self.init(
+            getSelection: { textView.textSelection },
+            setSelection: { textView.textSelection = $0 },
+            storage: TextStoringAdapter(textView: textView)
+        )
+    }
 }

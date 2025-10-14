@@ -1,7 +1,7 @@
 --binarygrouping none
 --decimalgrouping none
 --hexgrouping none
---indent tab
+--indent 4
 --octalgrouping none
 --self init-only
 --semicolons never

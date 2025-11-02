@@ -10,8 +10,8 @@ import TextFormation
 import TextStory
 
 @MainActor
-private final class TextStoringAdapter: @preconcurrency TextStoring {
-    weak var textView: STTextView?
+private final class STTextStoringAdapter: @preconcurrency TextStoring {
+    private weak var textView: STTextView?
 
     var length: Int {
         (textView?.contentStorage as? NSTextContentManager)?.length ?? 0
@@ -55,7 +55,7 @@ public extension TextInterfaceAdapter {
         self.init(
             getSelection: { textView.textSelection },
             setSelection: { textView.textSelection = $0 },
-            storage: TextStoringAdapter(textView: textView)
+            storage: STTextStoringAdapter(textView: textView)
         )
     }
 }

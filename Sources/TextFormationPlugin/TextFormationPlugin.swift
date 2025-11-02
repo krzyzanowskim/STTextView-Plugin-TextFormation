@@ -65,10 +65,11 @@ public struct TextFormationPlugin: STPlugin {
         }
 
         func shouldChangeText(in affectedRange: NSTextRange, replacementString: String?) -> Bool {
-            guard let string = replacementString else { return true }
+            guard !textView.undoActive, let replacementString else { return true }
 
-            if textView.undoActive {
-                return true
+            textView.undoManager?.beginUndoGrouping()
+            defer {
+                textView.undoManager?.endUndoGrouping()
             }
 
             let contentManager = textView.textContentManager
@@ -76,13 +77,7 @@ public struct TextFormationPlugin: STPlugin {
             let range = NSRange(affectedRange, in: contentManager)
             let limit = NSRange(contentManager.documentRange, in: contentManager).upperBound
 
-            let mutation = TextMutation(string: string, range: range, limit: limit)
-
-            textView.undoManager?.beginUndoGrouping()
-            defer {
-                textView.undoManager?.endUndoGrouping()
-            }
-
+            let mutation = TextMutation(string: replacementString, range: range, limit: limit)
             for filter in filters {
                 switch filter.processMutation(mutation, in: adapter, with: whitespaceProviders) {
                 case .none:

@@ -83,9 +83,10 @@ public struct TextFormationPlugin: STPlugin {
 
             let mutation = TextMutation(string: replacementString, range: range, limit: limit)
             for filter in filters {
+                // action to be taken after the filter has run.
                 switch filter.processMutation(mutation, in: adapter, with: whitespaceProviders) {
                 case .none:
-                    break
+                    continue
                 case .stop:
                     return true
                 case .discard:

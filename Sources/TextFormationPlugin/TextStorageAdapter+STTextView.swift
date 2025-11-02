@@ -30,27 +30,15 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
             return
         }
 
-        textView.textWillChange(textView)
-        let changeTextRange = NSTextRange(mutation.range, in: contentStorage)!
-        textView.textDelegate?.textView(textView, willChangeTextIn: changeTextRange, replacementString: mutation.string)
-
-        contentStorage.performEditingTransaction {
-            contentStorage.applyMutation(mutation)
-        }
-
-        textView.textDelegate?.textView(textView, didChangeTextIn: changeTextRange, replacementString: mutation.string)
-        textView.didChangeText()
-
+        textView.replaceCharacters(in: mutation.range, with: mutation.string)
         textView.breakUndoCoalescing()
 
         if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, !undoManager.isRedoing {
             let inverse = contentStorage.inverseMutation(for: mutation)
 
-            undoManager.registerUndo(withTarget: textView, handler: { textView in
-                MainActor.assumeIsolated {
-                    textView.replaceCharacters(in: inverse.range, with: inverse.string)
-                }
-            })
+            undoManager.registerUndo(withTarget: textView) { textView in
+                textView.replaceCharacters(in: inverse.postApplyRange, with: inverse.string)
+            }
         }
     }
 }

@@ -54,22 +54,26 @@ public struct TextFormationPlugin: STPlugin {
     public class Coordinator {
         private let adapter: TextInterfaceAdapter
         private let textView: STTextView
-        let filters: [Filter]
-        let whitespaceProviders: WhitespaceProviders
+        private var isProcessing: Bool
+        private let filters: [Filter]
+        private let whitespaceProviders: WhitespaceProviders
 
         init(view: STTextView, filters: [Filter], whitespaceProviders: WhitespaceProviders) {
             self.textView = view
             self.filters = filters
             self.whitespaceProviders = whitespaceProviders
             self.adapter = TextInterfaceAdapter(textView: view)
+            self.isProcessing = false
         }
 
         func shouldChangeText(in affectedRange: NSTextRange, replacementString: String?) -> Bool {
-            guard !textView.undoActive, let replacementString else { return true }
+            guard !isProcessing, !textView.undoActive, let replacementString else { return true }
 
+            isProcessing = true
             textView.undoManager?.beginUndoGrouping()
             defer {
                 textView.undoManager?.endUndoGrouping()
+                isProcessing = false
             }
 
             let contentManager = textView.textContentManager

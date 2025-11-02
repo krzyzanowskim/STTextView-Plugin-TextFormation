@@ -30,7 +30,7 @@ private final class TextStoringAdapter: @preconcurrency TextStoring {
             return
         }
 
-        textView.replaceCharacters(in: mutation.range, with: mutation.string)
+        textView.insertText(mutation.string, replacementRange: mutation.range)
         textView.breakUndoCoalescing()
 
         if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, !undoManager.isRedoing {

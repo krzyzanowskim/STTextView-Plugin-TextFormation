@@ -34,10 +34,12 @@ private final class STTextStoringAdapter: @preconcurrency TextStoring {
         textView.breakUndoCoalescing()
 
         if let undoManager = textView.undoManager, undoManager.isUndoRegistrationEnabled, !undoManager.isUndoing, !undoManager.isRedoing {
-            let inverse = contentStorage.inverseMutation(for: mutation)
+            if substring(from: mutation.range) != nil {
+                let inverse = contentStorage.inverseMutation(for: mutation)
 
-            undoManager.registerUndo(withTarget: textView) { textView in
-                textView.replaceCharacters(in: inverse.postApplyRange, with: inverse.string)
+                undoManager.registerUndo(withTarget: textView) { textView in
+                    textView.replaceCharacters(in: inverse.postApplyRange, with: inverse.string)
+                }
             }
         }
     }

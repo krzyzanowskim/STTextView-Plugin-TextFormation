@@ -1,4 +1,4 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.9
 
 import PackageDescription
 
@@ -8,7 +8,7 @@ let settings: [SwiftSetting] = [
 
 let package = Package(
     name: "TextFormationPlugin",
-    platforms: [.macOS(.v12), .iOS(.v16), .macCatalyst(.v16)],
+    platforms: [.macOS(.v14), .iOS(.v16), .macCatalyst(.v16)],
     products: [
         .library(name: "TextFormationPlugin", targets: ["TextFormationPlugin"]),
     ],

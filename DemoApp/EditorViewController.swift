@@ -13,7 +13,7 @@ final class EditorViewController: NSViewController {
         view = scrollView
 
         // a delegate must be set for plug ins to work
-        textView.delegate = self
+        textView.textDelegate = self
     }
 
     override func viewDidLoad() {
@@ -48,7 +48,7 @@ final class EditorViewController: NSViewController {
         textView.backgroundColor = .controlBackgroundColor
         textView.font = .monospacedSystemFont(ofSize: 0, weight: .regular)
 
-        textView.string = """
+        textView.text = """
         import Foundation
 
         func hello() {

@@ -53,16 +53,23 @@ public struct TextFormationPlugin: STPlugin {
     @MainActor
     public class Coordinator {
         private let adapter: TextInterfaceAdapter
+        private let storageAdapter: STTextStoringAdapter
         private let textView: STTextView
         private var isProcessing: Bool
         private let filters: [Filter]
         private let whitespaceProviders: WhitespaceProviders
 
         init(view: STTextView, filters: [Filter], whitespaceProviders: WhitespaceProviders) {
+            let storageAdapter = STTextStoringAdapter(textView: view)
             self.textView = view
             self.filters = filters
             self.whitespaceProviders = whitespaceProviders
-            self.adapter = TextInterfaceAdapter(textView: view)
+            self.storageAdapter = storageAdapter
+            self.adapter = TextInterfaceAdapter(
+                getSelection: { view.textSelection },
+                setSelection: { view.textSelection = $0 },
+                storage: storageAdapter
+            )
             self.isProcessing = false
         }
 
@@ -70,9 +77,9 @@ public struct TextFormationPlugin: STPlugin {
             guard !isProcessing, !textView.undoActive, let replacementString else { return true }
 
             isProcessing = true
-            textView.undoManager?.beginUndoGrouping()
+            storageAdapter.startMutationSession()
             defer {
-                textView.undoManager?.endUndoGrouping()
+                storageAdapter.finishMutationSession()
                 isProcessing = false
             }
 
@@ -88,13 +95,13 @@ public struct TextFormationPlugin: STPlugin {
                 case .none:
                     continue
                 case .stop:
-                    return true
+                    return storageAdapter.applyOriginalMutationIfNeeded(mutation)
                 case .discard:
                     return false
                 }
             }
 
-            return true
+            return storageAdapter.applyOriginalMutationIfNeeded(mutation)
         }
     }
 }

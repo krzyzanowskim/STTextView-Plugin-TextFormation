@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "coretextswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CoreTextSwift",
+      "state" : {
+        "revision" : "833177201d6421e6322296f39fce6ff6ae52618a",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "rearrange",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChimeHQ/Rearrange",
@@ -14,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/STTextKitPlus",
       "state" : {
-        "revision" : "87d700502fe9b64a7b29a553505ce94adc2be7da",
-        "version" : "0.1.4"
+        "revision" : "2ee74906f4d753458eeaa9a2f6d4538aacb86a1d",
+        "version" : "0.3.0"
       }
     },
     {
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/STTextView",
       "state" : {
-        "revision" : "8c4b880259f122c5ff4283adc698ac0d5d4b9027",
-        "version" : "0.9.6"
+        "revision" : "a7da6bdbbd3d0beba116868941266ede11bef5b6",
+        "version" : "2.4.0"
       }
     },
     {

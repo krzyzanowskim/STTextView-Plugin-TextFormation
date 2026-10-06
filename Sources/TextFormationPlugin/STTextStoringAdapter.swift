@@ -54,17 +54,21 @@ final class STTextStoringAdapter: @preconcurrency TextStoring {
             return
         }
 
-        beginUndoGroupingIfNeeded(on: textView)
+        beginUndoGroupingIfNeeded(on: textView, for: mutation)
         didApplyMutation = true
         applyMutationRegisteringUndo(mutation, to: textView)
     }
 
-    private func beginUndoGroupingIfNeeded(on textView: STTextView) {
+    private func beginUndoGroupingIfNeeded(on textView: STTextView, for mutation: TextStory.TextMutation) {
         guard !isUndoGrouping else {
             return
         }
 
-        textView.breakUndoCoalescing()
+        if let textRange = NSTextRange(mutation.range, in: textView.textContentManager) {
+            textView.continueUndoCoalescing(for: textRange)
+        } else {
+            textView.breakUndoCoalescing()
+        }
         textView.undoManager?.beginUndoGrouping()
         isUndoGrouping = true
     }
